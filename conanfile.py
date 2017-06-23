@@ -1,6 +1,5 @@
 
 from conans import CMake, ConanFile, tools
-from conans.errors import ConanException
 
 
 class GrpcConan(ConanFile):
@@ -17,10 +16,9 @@ class GrpcConan(ConanFile):
     exports = "FindgRPC.cmake", "FindProtobuf.cmake"
     exports_sources = "zlib.patch"
 
-    def config_options(self):
+    def configure(self):
         if self.settings.compiler == 'gcc':
-            if self.settings.compiler.libcxx != 'libstdc++11':
-                raise ConanException("You must use the setting compiler.libcxx=libstdc++11")
+            self.settings.compiler.libcxx = 'libstdc++11'
 
     def source(self):
         self.run("git clone -b v%s https://github.com/grpc/grpc.git" % self.version)
@@ -63,9 +61,7 @@ class GrpcConan(ConanFile):
         """ Build on Unix systems """
         self.patch_prefix()
         self.run("cd grpc && make")
-        self.run("cd grpc && make install")
-        if self.settings.os == "Linux":
-            self.run("ldconfig -n %s/lib" % self.package_folder)
+        self.run("cd grpc && make static")
 
     def build_windows(self):
         """ Build on Windows systems """
@@ -85,7 +81,21 @@ class GrpcConan(ConanFile):
         self.copy("FindProtobuf.cmake", ".", ".")
         self.copy("FindgRPC.cmake", ".", ".")
 
+        self.copy("*.h", "include", "grpc/include")
+        if self.settings.os != "Windows":
+            self.copy("*", "bin", "bins/opt", keep_path=False)
+            self.copy("*", "lib", "libs/opt", keep_path=False)
+
     def package_info(self):
-        self.cpp_info.libs = ["grpc"]
-        self.cpp_info.libs = ["grpc++_unsecure"]
-        self.cpp_info.libs = ["gpr"]
+        self.cpp_info.libs = [
+            "gpr"
+            "grpc",
+            "grpc++",
+            "grpc++_cronet",
+            "grpc++_error_details",
+            "grpc++_reflection",
+            "grpc++_unsecure",
+            "grpc_cronet",
+            "grpc_unsecure",
+            "grpc_unsecure"
+        ]

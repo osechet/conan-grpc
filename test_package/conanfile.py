@@ -26,6 +26,6 @@ class GRPCTestConan(ConanFile):
                                   stdout=fnull,
                                   stderr=subprocess.STDOUT)
 
-        self.run("%s" % (os.sep.join([".", "bin", "greeter_client"])))
+        self.run(os.sep.join([".", "bin", "greeter_client"]))
         time.sleep(5)
         server.terminate()
