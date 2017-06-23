@@ -24,10 +24,10 @@ class GrpcConan(ConanFile):
         self.run("git clone -b v%s https://github.com/grpc/grpc.git" % self.version)
         self.run("cd grpc && git submodule update --init")
 
-        #self.copy("zlib.patch", ".", ".")
-
-        # patch zlib's CMakeLists.txt
-        tools.patch(base_path="grpc/third_party/zlib",
+        if self.settings.os == "Windows":
+            #self.copy("zlib.patch", ".", ".")
+            # patch zlib's CMakeLists.txt
+            tools.patch(base_path="grpc/third_party/zlib",
                     patch_string="""
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
@@ -41,25 +41,8 @@ class GrpcConan(ConanFile):
 
  #============================================================================""")
 
-    def patch_prefix(self):
-        """ patch Makefile to set the install prefix """
-        tools.patch(base_path="grpc",
-                    patch_string="""
---- a/Makefile
-+++ b/Makefile
-@@ -233,7 +233,7 @@ DEFINES_counters = NDEBUG
- # General settings.
- # You may want to change these depending on your system.
-
--prefix ?= /usr/local
-+prefix ?= %s
-
- PROTOC ?= protoc
- DTRACE ?= dtrace""" % self.package_folder)
-
     def build_unix(self):
         """ Build on Unix systems """
-        self.patch_prefix()
         self.run("cd grpc && make")
         self.run("cd grpc && make static")
 
