@@ -19,12 +19,6 @@ matrix:
    include:
 
       - <<: *linux
-        env: CONAN_GCC_VERSIONS=4.8 CONAN_DOCKER_IMAGE=lasote/conangcc48 CONAN_CURRENT_PAGE=1
-
-      - <<: *linux
-        env: CONAN_GCC_VERSIONS=4.8 CONAN_DOCKER_IMAGE=lasote/conangcc48 CONAN_CURRENT_PAGE=2
-
-      - <<: *linux
         env: CONAN_GCC_VERSIONS=4.9 CONAN_DOCKER_IMAGE=lasote/conangcc49 CONAN_CURRENT_PAGE=1
 
       - <<: *linux
@@ -37,10 +31,10 @@ matrix:
         env: CONAN_GCC_VERSIONS=5.4 CONAN_DOCKER_IMAGE=lasote/conangcc54 CONAN_CURRENT_PAGE=2
 
       - <<: *linux
-        env: CONAN_GCC_VERSIONS=6.2 CONAN_DOCKER_IMAGE=lasote/conangcc62 CONAN_CURRENT_PAGE=1
+        env: CONAN_GCC_VERSIONS=6.3 CONAN_DOCKER_IMAGE=lasote/conangcc63 CONAN_CURRENT_PAGE=1
 
       - <<: *linux
-        env: CONAN_GCC_VERSIONS=6.2 CONAN_DOCKER_IMAGE=lasote/conangcc62 CONAN_CURRENT_PAGE=2
+        env: CONAN_GCC_VERSIONS=6.3 CONAN_DOCKER_IMAGE=lasote/conangcc63 CONAN_CURRENT_PAGE=2
 
       - <<: *osx
         osx_image: xcode7.3
@@ -69,10 +63,6 @@ matrix:
 install:
   - chmod +x .travis/install.sh
   - ./.travis/install.sh
-
-before_script:
-  - chmod +x .travis/before_script.sh
-  - ./.travis/before_script.sh
 
 script:
   - chmod +x .travis/run.sh
