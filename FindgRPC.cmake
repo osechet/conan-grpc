@@ -257,7 +257,7 @@ if(GRPC_FOUND)
         list(APPEND _deps
             "${_gRPC_ALLTARGETS_LIBRARIES}"
         )
-        set_target_properties(gRPC::grpc PROPERTIES
+        set_target_properties(gRPC::gpr PROPERTIES
                               INTERFACE_LINK_LIBRARIES "${_deps}")
     endif(NOT TARGET gRPC::gpr)
 
