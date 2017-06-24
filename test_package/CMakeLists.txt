@@ -7,10 +7,7 @@ project(HelloWorld CXX)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-# Protobuf
-find_package(Protobuf REQUIRED)
-
-# gRPC
+# Dependencies
 find_package(gRPC REQUIRED)
 
 # Proto file

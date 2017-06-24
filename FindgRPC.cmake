@@ -79,6 +79,7 @@
 
 include(CMakeFindDependencyMacro)
 find_dependency(Protobuf)
+find_dependency(ZLIB)
 
 function(GRPC_GENERATE_CPP SRCS HDRS)
     cmake_parse_arguments(grpc "" "" "" ${ARGN})
@@ -274,8 +275,9 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPC_LIBRARY_RELEASE}")
         endif()
 
+        list(APPEND _deps "${ZLIB_LIBRARIES}" "gRPC::gpr")
         set_target_properties(gRPC::grpc PROPERTIES
-                              INTERFACE_LINK_LIBRARIES "gRPC::gpr")
+                              INTERFACE_LINK_LIBRARIES "${_deps}")
     endif(NOT TARGET gRPC::grpc)
 
     if(NOT TARGET gRPC::grpc++)
@@ -302,8 +304,8 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPCPP_LIBRARY_RELEASE}")
         endif()
 
-        list(APPEND _deps "protobuf::libprotobuf" "gRPC::grpc" "gRPC::gpr")
-        set_target_properties(gRPC::grpc PROPERTIES
+        list(APPEND _deps "${ZLIB_LIBRARIES}" "protobuf::libprotobuf" "gRPC::grpc" "gRPC::gpr")
+        set_target_properties(gRPC::grpc++ PROPERTIES
                               INTERFACE_LINK_LIBRARIES "${_deps}")
     endif(NOT TARGET gRPC::grpc++)
 

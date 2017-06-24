@@ -41,10 +41,26 @@ class GrpcConan(ConanFile):
 
  #============================================================================""")
 
+    def patch_prefix(self):
+        """ patch Makefile to set the install prefix """
+        tools.patch(base_path="grpc",
+                    patch_string="""
+--- a/Makefile
++++ b/Makefile
+@@ -233,7 +233,7 @@ DEFINES_counters = NDEBUG
+ # General settings.
+ # You may want to change these depending on your system.
+
+-prefix ?= /usr/local
++prefix ?= %s
+
+ PROTOC ?= protoc
+ DTRACE ?= dtrace""" % self.package_folder)
+
     def build_unix(self):
         """ Build on Unix systems """
-        self.run("cd grpc && make")
-        self.run("cd grpc && make static")
+        self.patch_prefix()
+        self.run("cd grpc && make install-headers install-static install-plugins")
 
     def build_windows(self):
         """ Build on Windows systems """
@@ -63,11 +79,6 @@ class GrpcConan(ConanFile):
     def package(self):
         self.copy("FindProtobuf.cmake", ".", ".")
         self.copy("FindgRPC.cmake", ".", ".")
-
-        self.copy("*.h", "include", "grpc/include")
-        if self.settings.os != "Windows":
-            self.copy("*", "bin", "bins/opt", keep_path=False)
-            self.copy("*", "lib", "libs/opt", keep_path=False)
 
     def package_info(self):
         self.cpp_info.libs = [
