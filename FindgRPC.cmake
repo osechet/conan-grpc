@@ -226,6 +226,10 @@ find_package_handle_standard_args(GRPC DEFAULT_MSG
 if(GRPC_FOUND)
     set(GRPC_INCLUDE_DIRS ${GRPC_INCLUDE_DIR})
 
+    if(Threads_FOUND)
+        list(APPEND _gRPC_ALLTARGETS_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+    endif()
+
     if(NOT TARGET gRPC::gpr)
         add_library(gRPC::gpr UNKNOWN IMPORTED)
         set_target_properties(gRPC::gpr PROPERTIES
@@ -249,6 +253,12 @@ if(GRPC_FOUND)
                 IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
                 IMPORTED_LOCATION_RELEASE "${GPR_LIBRARY_RELEASE}")
         endif()
+
+        list(APPEND _deps
+            "${_gRPC_ALLTARGETS_LIBRARIES}"
+        )
+        set_target_properties(gRPC::grpc PROPERTIES
+                              INTERFACE_LINK_LIBRARIES "${_deps}")
     endif(NOT TARGET gRPC::gpr)
 
     if(NOT TARGET gRPC::grpc)
@@ -275,7 +285,11 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPC_LIBRARY_RELEASE}")
         endif()
 
-        list(APPEND _deps "${ZLIB_LIBRARIES}" "gRPC::gpr")
+        list(APPEND _deps
+            "${ZLIB_LIBRARIES}"
+            "${_gRPC_ALLTARGETS_LIBRARIES}"
+            "gRPC::gpr"
+        )
         set_target_properties(gRPC::grpc PROPERTIES
                               INTERFACE_LINK_LIBRARIES "${_deps}")
     endif(NOT TARGET gRPC::grpc)
@@ -304,7 +318,13 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPCPP_LIBRARY_RELEASE}")
         endif()
 
-        list(APPEND _deps "${ZLIB_LIBRARIES}" "protobuf::libprotobuf" "gRPC::grpc" "gRPC::gpr")
+        list(APPEND _deps
+            "${ZLIB_LIBRARIES}"
+            "protobuf::libprotobuf"
+            "${_gRPC_ALLTARGETS_LIBRARIES}"
+            "gRPC::grpc"
+            "gRPC::gpr"
+        )
         set_target_properties(gRPC::grpc++ PROPERTIES
                               INTERFACE_LINK_LIBRARIES "${_deps}")
     endif(NOT TARGET gRPC::grpc++)
@@ -333,8 +353,14 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPCPP_CRONET_LIBRARY_RELEASE}")
         endif()
 
+        list(APPEND _deps
+            "protobuf::libprotobuf"
+            "${_gRPC_ALLTARGETS_LIBRARIES}"
+            "gRPC::gpr"
+            "gRPC::grpc_cronet"
+        )
         set_target_properties(gRPC::grpc++_cronet PROPERTIES
-                              INTERFACE_LINK_LIBRARIES "protobuf::libprotobuf")
+                              INTERFACE_LINK_LIBRARIES "${_deps}")
     endif(NOT TARGET gRPC::grpc++_cronet)
 
     if(NOT TARGET gRPC::grpc++_error_details)
@@ -361,8 +387,13 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPCPP_ERROR_DETAILS_LIBRARY_RELEASE}")
         endif()
 
+        list(APPEND _deps
+            "protobuf::libprotobuf"
+            "${_gRPC_ALLTARGETS_LIBRARIES}"
+            "gRPC::grpc++"
+        )
         set_target_properties(gRPC::grpc++_error_details PROPERTIES
-                              INTERFACE_LINK_LIBRARIES "protobuf::libprotobuf")
+                              INTERFACE_LINK_LIBRARIES "${_deps}")
     endif(NOT TARGET gRPC::grpc++_error_details)
 
     if(NOT TARGET gRPC::grpc++_reflection)
@@ -389,7 +420,11 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPCPP_REFLECTION_LIBRARY_RELEASE}")
         endif()
 
-        list(APPEND _deps "protobuf::libprotobuf" "gRPC::grpc++")
+        list(APPEND _deps
+            "protobuf::libprotobuf"
+            "${_gRPC_ALLTARGETS_LIBRARIES}"
+            "gRPC::grpc++"
+        )
         set_target_properties(gRPC::grpc++_reflection PROPERTIES
                               INTERFACE_LINK_LIBRARIES "${_deps}")
     endif(NOT TARGET gRPC::grpc++_reflection)
@@ -418,7 +453,12 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPCPP_UNSECURE_LIBRARY_RELEASE}")
         endif()
 
-        list(APPEND _deps "protobuf::libprotobuf" "gRPC::grpc_unsecure" "gRPC::gpr")
+        list(APPEND _deps
+            "protobuf::libprotobuf"
+            "${_gRPC_ALLTARGETS_LIBRARIES}"
+            "gRPC::gpr"
+            "gRPC::grpc_unsecure"
+        )
         set_target_properties(gRPC::grpc++_unsecure PROPERTIES
                               INTERFACE_LINK_LIBRARIES "${_deps}")
     endif(NOT TARGET gRPC::grpc++_unsecure)
@@ -447,8 +487,12 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPC_CRONET_LIBRARY_RELEASE}")
         endif()
 
+        list(APPEND _deps
+            "${_gRPC_ALLTARGETS_LIBRARIES}"
+            "gRPC::gpr"
+        )
         set_target_properties(gRPC::grpc_cronet PROPERTIES
-                              INTERFACE_LINK_LIBRARIES "gRPC::gpr")
+                              INTERFACE_LINK_LIBRARIES "${_deps}")
     endif(NOT TARGET gRPC::grpc_cronet)
 
     if(NOT TARGET gRPC::grpc_unsecure)
@@ -475,7 +519,11 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPC_UNSECURE_LIBRARY_RELEASE}")
         endif()
 
+        list(APPEND _deps
+            "${_gRPC_ALLTARGETS_LIBRARIES}"
+            "gRPC::gpr"
+        )
         set_target_properties(gRPC::grpc_unsecure PROPERTIES
-                              INTERFACE_LINK_LIBRARIES "gRPC::gpr")
+                              INTERFACE_LINK_LIBRARIES "${_deps}")
     endif(NOT TARGET gRPC::grpc_unsecure)
 endif()
