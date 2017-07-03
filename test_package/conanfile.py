@@ -15,6 +15,10 @@ class GRPCTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
 
+    def configure(self):
+        if self.settings.compiler == 'gcc':
+            self.settings.compiler.libcxx = 'libstdc++11'
+
     def build(self):
         cmake = CMake(self.settings)
         self.run('cmake "%s" %s' % (self.conanfile_directory, cmake.command_line))

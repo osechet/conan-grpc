@@ -78,6 +78,7 @@
 #
 
 include(CMakeFindDependencyMacro)
+find_dependency(OpenSSL)
 find_dependency(Protobuf)
 find_dependency(ZLIB)
 
@@ -223,12 +224,16 @@ find_package_handle_standard_args(GRPC DEFAULT_MSG
     GRPC_INCLUDE_DIR
 )
 
+if(UNIX)
+  set(_gRPC_ALLTARGETS_LIBRARIES "dl" "rt" "m" "Threads::Threads")
+endif()
+
+if(WIN32 AND MSVC)
+  set(_gRPC_BASELIB_LIBRARIES wsock32 ws2_32)
+endif()
+
 if(GRPC_FOUND)
     set(GRPC_INCLUDE_DIRS ${GRPC_INCLUDE_DIR})
-
-    if(Threads_FOUND)
-        list(APPEND _gRPC_ALLTARGETS_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
-    endif()
 
     if(NOT TARGET gRPC::gpr)
         add_library(gRPC::gpr UNKNOWN IMPORTED)
@@ -286,6 +291,8 @@ if(GRPC_FOUND)
         endif()
 
         list(APPEND _deps
+            "${_gRPC_BASELIB_LIBRARIES}"
+            "OpenSSL::SSL"
             "${ZLIB_LIBRARIES}"
             "${_gRPC_ALLTARGETS_LIBRARIES}"
             "gRPC::gpr"
@@ -319,7 +326,8 @@ if(GRPC_FOUND)
         endif()
 
         list(APPEND _deps
-            "${ZLIB_LIBRARIES}"
+            "${_gRPC_BASELIB_LIBRARIES}"
+            "OpenSSL::SSL"
             "protobuf::libprotobuf"
             "${_gRPC_ALLTARGETS_LIBRARIES}"
             "gRPC::grpc"
@@ -354,6 +362,8 @@ if(GRPC_FOUND)
         endif()
 
         list(APPEND _deps
+            "${_gRPC_BASELIB_LIBRARIES}"
+            "OpenSSL::SSL"
             "protobuf::libprotobuf"
             "${_gRPC_ALLTARGETS_LIBRARIES}"
             "gRPC::gpr"
@@ -388,6 +398,7 @@ if(GRPC_FOUND)
         endif()
 
         list(APPEND _deps
+            "${_gRPC_BASELIB_LIBRARIES}"
             "protobuf::libprotobuf"
             "${_gRPC_ALLTARGETS_LIBRARIES}"
             "gRPC::grpc++"
@@ -454,6 +465,7 @@ if(GRPC_FOUND)
         endif()
 
         list(APPEND _deps
+            "${_gRPC_BASELIB_LIBRARIES}"
             "protobuf::libprotobuf"
             "${_gRPC_ALLTARGETS_LIBRARIES}"
             "gRPC::gpr"
@@ -488,6 +500,8 @@ if(GRPC_FOUND)
         endif()
 
         list(APPEND _deps
+            "${_gRPC_BASELIB_LIBRARIES}"
+            "OpenSSL::SSL"
             "${_gRPC_ALLTARGETS_LIBRARIES}"
             "gRPC::gpr"
         )
@@ -520,6 +534,7 @@ if(GRPC_FOUND)
         endif()
 
         list(APPEND _deps
+            "${_gRPC_BASELIB_LIBRARIES}"
             "${_gRPC_ALLTARGETS_LIBRARIES}"
             "gRPC::gpr"
         )
