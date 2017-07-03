@@ -12,7 +12,7 @@ class GrpcConan(ConanFile):
     url = "https://github.com/osechet/conan-grpc"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
-    requires = "Protobuf/3.3.1@memsharded/testing"
+    requires = "Protobuf/3.3.1@memsharded/testing", "OpenSSL/1.0.2l@conan/stable"
     exports = "FindgRPC.cmake", "FindProtobuf.cmake"
     exports_sources = "zlib.patch"
 
