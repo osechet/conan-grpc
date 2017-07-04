@@ -224,7 +224,7 @@ find_package_handle_standard_args(GRPC DEFAULT_MSG
     GRPC_INCLUDE_DIR
 )
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
   set(_gRPC_ALLTARGETS_LIBRARIES "dl" "rt" "m" "Threads::Threads")
 endif()
 
