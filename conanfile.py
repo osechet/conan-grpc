@@ -22,8 +22,11 @@ class GrpcConan(ConanFile):
             if self.settings.compiler.libcxx != 'libstdc++11':
                 raise ConanException("You must use the setting compiler.libcxx=libstdc++11")
 
+    def configure(self):
+        self.options["Protobuf"].shared = False
+
     def source(self):
-        self.run("git clone -b v%s https://github.com/grpc/grpc.git" % self.version)
+        self.run("git clone --depth 1 -b v%s https://github.com/grpc/grpc.git" % self.version)
         self.run("cd grpc && git submodule update --init")
 
         #self.copy("zlib.patch", ".", ".")
