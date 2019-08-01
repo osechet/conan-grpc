@@ -6,69 +6,48 @@ class GrpcConan(ConanFile):
     """ gRPC Conan package """
 
     name = "gRPC"
-    version = "1.3.7"
+    version = "1.12.0"
     description = "Conan package for gRPC"
     license = "MIT"
     url = "https://github.com/osechet/conan-grpc"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
-    requires = "Protobuf/3.3.1@memsharded/testing", "OpenSSL/1.0.2l@conan/stable"
-    exports = "FindgRPC.cmake", "FindProtobuf.cmake"
-    exports_sources = "zlib.patch"
+    requires = "protobuf/3.6.1@bincrafters/stable", "OpenSSL/1.0.2l@conan/stable"
+    exports = ["LICENSE.md", "FindgRPC.cmake"]
 
-    def configure(self):
-        if self.settings.compiler == 'gcc':
-            self.settings.compiler.libcxx = 'libstdc++11'
 
     def source(self):
         self.run("git clone -b v%s https://github.com/grpc/grpc.git" % self.version)
-        self.run("cd grpc && git submodule update --init")
+        with tools.chdir("grpc"):
+            self.run("git submodule update --init")
 
+
+    def build_requirements(self):
         if self.settings.os == "Windows":
-            #self.copy("zlib.patch", ".", ".")
-            # patch zlib's CMakeLists.txt
-            tools.patch(base_path="grpc/third_party/zlib",
-                    patch_string="""
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -83,7 +83,7 @@ configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/zlib.pc.cmakein
- 		${ZLIB_PC} @ONLY)
- configure_file(	${CMAKE_CURRENT_SOURCE_DIR}/zconf.h.cmakein
- 		${CMAKE_CURRENT_BINARY_DIR}/zconf.h @ONLY)
--include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR})
-+include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+            self.build_requires("ninja_installer/1.9.0@bincrafters/stable")
 
-
- #============================================================================""")
-
-    def patch_prefix(self):
-        """ patch Makefile to set the install prefix """
-        tools.patch(base_path="grpc",
-                    patch_string="""
---- a/Makefile
-+++ b/Makefile
-@@ -233,7 +233,7 @@ DEFINES_counters = NDEBUG
- # General settings.
- # You may want to change these depending on your system.
-
--prefix ?= /usr/local
-+prefix ?= %s
-
- PROTOC ?= protoc
- DTRACE ?= dtrace""" % self.package_folder)
 
     def build_unix(self):
         """ Build on Unix systems """
-        self.patch_prefix()
-        self.run("cd grpc && make install-headers install-static install-plugins")
+        cxx_flags = []
+        if self.settings.compiler.libcxx == "libstdc++":
+            cxx_flags.append("-D_GLIBCXX_USE_CXX11_ABI=0")
+        else:
+            cxx_flags.append("-D_GLIBCXX_USE_CXX11_ABI=1")
+        with tools.chdir("grpc"):
+            self.run("CXXFLAGS=%s make prefix=%s install-headers install-static install-plugins" %
+                     (" ".join(cxx_flags), self.package_folder))
+
 
     def build_windows(self):
         """ Build on Windows systems """
-        cmake = CMake(self)
+        # For MinGW, we must add -D_WIN32_WINNT=0x0600 to CXX_FLAGS
+        cmake = CMake(self, generator="Ninja")
         cmake.definitions["CMAKE_INSTALL_PREFIX"] = self.package_folder
         cmake.configure(source_dir="grpc")
         cmake.build()
         cmake.build(target="install")
+
 
     def build(self):
         if self.settings.os == "Windows":
@@ -76,9 +55,11 @@ class GrpcConan(ConanFile):
         else:
             self.build_unix()
 
+
     def package(self):
-        self.copy("FindProtobuf.cmake", ".", ".")
-        self.copy("FindgRPC.cmake", ".", ".")
+        self.copy("FindgRPC.cmake", src=".", dst=".")
+        self.copy("LICENSE", src="grpc", dst=".")
+
 
     def package_info(self):
         self.cpp_info.libs = [
@@ -91,5 +72,4 @@ class GrpcConan(ConanFile):
             "grpc++_unsecure",
             "grpc_cronet",
             "grpc_unsecure",
-            "grpc_unsecure"
         ]
