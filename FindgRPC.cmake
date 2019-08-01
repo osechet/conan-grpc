@@ -157,6 +157,73 @@ function(GRPC_GENERATE_CPP SRCS HDRS)
     set(${HDRS} ${${HDRS}} PARENT_SCOPE)
 endfunction()
 
+function(GRPC_GENERATE_PYTHON SRCS)
+    find_dependency(PythonInterp 3)
+
+    cmake_parse_arguments(grpc "" "" "" ${ARGN})
+
+    set(PROTO_FILES "${grpc_UNPARSED_ARGUMENTS}")
+    if(NOT PROTO_FILES)
+        message(SEND_ERROR "Error: GRPC_GENERATE_PYTHON() called without any proto files")
+        return()
+    endif()
+
+    if(GRPC_GENERATE_CPP_APPEND_PATH)
+        # Create an include path for each file specified
+        foreach(FIL ${PROTO_FILES})
+        get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
+        get_filename_component(ABS_PATH ${ABS_FIL} PATH)
+        list(FIND _grpc_include_path ${ABS_PATH} _contains_already)
+        if(${_contains_already} EQUAL -1)
+            list(APPEND _grpc_include_path -I ${ABS_PATH})
+        endif()
+        endforeach()
+    else()
+        set(_grpc_include_path -I ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(DEFINED GRPC_IMPORT_DIRS)
+        foreach(DIR ${GRPC_IMPORT_DIRS})
+        get_filename_component(ABS_PATH ${DIR} ABSOLUTE)
+        list(FIND _grpc_include_path ${ABS_PATH} _contains_already)
+        if(${_contains_already} EQUAL -1)
+            list(APPEND _grpc_include_path -I ${ABS_PATH})
+        endif()
+        endforeach()
+    endif()
+
+    set(${SRCS})
+    foreach(FIL ${PROTO_FILES})
+        get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
+        get_filename_component(FIL_WE ${FIL} NAME_WE)
+        if(NOT GRPC_GENERATE_CPP_APPEND_PATH)
+        get_filename_component(FIL_DIR ${FIL} DIRECTORY)
+        if(FIL_DIR)
+            set(FIL_WE "${FIL_DIR}/${FIL_WE}")
+        endif()
+        endif()
+
+        list(APPEND ${SRCS} "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}_pb2.py")
+
+        add_custom_command(
+            OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}_pb2_grpc.py"
+                   "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}_pb2.py"
+            COMMAND ${PYTHON_EXECUTABLE}
+            ARGS "-m" "grpc_tools.protoc"
+                 ${_grpc_include_path}
+                 "--python_out=${CMAKE_CURRENT_BINARY_DIR}"
+                 "--grpc_python_out=${CMAKE_CURRENT_BINARY_DIR}"
+                 ${ABS_FIL}
+            DEPENDS ${ABS_FIL} ${PYTHON_EXECUTABLE}
+            COMMENT "Running Python protocol buffer and grpc compiler on ${FIL}"
+            VERBATIM
+        )
+    endforeach()
+
+    set_source_files_properties(${${SRCS}} ${${HDRS}} PROPERTIES GENERATED TRUE)
+    set(${SRCS} ${${SRCS}} PARENT_SCOPE)
+endfunction()
+
 include(SelectLibraryConfigurations)
 
 function(_grpc_find_libraries name filename)
@@ -217,7 +284,7 @@ find_path(GRPC_INCLUDE_DIR
 mark_as_advanced(GRPC_INCLUDE_DIR)
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(GRPC DEFAULT_MSG
+find_package_handle_standard_args(gRPC DEFAULT_MSG
     GRPC_LIBRARIES
     GRPCPP_UNSECURE_LIBRARIES
     GPR_LIBRARIES
@@ -232,7 +299,7 @@ if(WIN32 AND MSVC)
   set(_gRPC_BASELIB_LIBRARIES wsock32 ws2_32)
 endif()
 
-if(GRPC_FOUND)
+if(gRPC_FOUND)
     set(GRPC_INCLUDE_DIRS ${GRPC_INCLUDE_DIR})
 
     if(NOT TARGET gRPC::gpr)
@@ -259,6 +326,7 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GPR_LIBRARY_RELEASE}")
         endif()
 
+        unset(_deps)
         list(APPEND _deps
             "${_gRPC_ALLTARGETS_LIBRARIES}"
         )
@@ -290,6 +358,7 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPC_LIBRARY_RELEASE}")
         endif()
 
+        unset(_deps)
         list(APPEND _deps
             "${_gRPC_BASELIB_LIBRARIES}"
             "OpenSSL::SSL"
@@ -325,6 +394,7 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPCPP_LIBRARY_RELEASE}")
         endif()
 
+        unset(_deps)
         list(APPEND _deps
             "${_gRPC_BASELIB_LIBRARIES}"
             "OpenSSL::SSL"
@@ -361,6 +431,7 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPCPP_CRONET_LIBRARY_RELEASE}")
         endif()
 
+        unset(_deps)
         list(APPEND _deps
             "${_gRPC_BASELIB_LIBRARIES}"
             "OpenSSL::SSL"
@@ -368,6 +439,7 @@ if(GRPC_FOUND)
             "${_gRPC_ALLTARGETS_LIBRARIES}"
             "gRPC::gpr"
             "gRPC::grpc_cronet"
+            "gRPC::grpc"
         )
         set_target_properties(gRPC::grpc++_cronet PROPERTIES
                               INTERFACE_LINK_LIBRARIES "${_deps}")
@@ -397,6 +469,7 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPCPP_ERROR_DETAILS_LIBRARY_RELEASE}")
         endif()
 
+        unset(_deps)
         list(APPEND _deps
             "${_gRPC_BASELIB_LIBRARIES}"
             "protobuf::libprotobuf"
@@ -431,10 +504,12 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPCPP_REFLECTION_LIBRARY_RELEASE}")
         endif()
 
+        unset(_deps)
         list(APPEND _deps
             "protobuf::libprotobuf"
             "${_gRPC_ALLTARGETS_LIBRARIES}"
             "gRPC::grpc++"
+            "gRPC::grpc"
         )
         set_target_properties(gRPC::grpc++_reflection PROPERTIES
                               INTERFACE_LINK_LIBRARIES "${_deps}")
@@ -464,6 +539,7 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPCPP_UNSECURE_LIBRARY_RELEASE}")
         endif()
 
+        unset(_deps)
         list(APPEND _deps
             "${_gRPC_BASELIB_LIBRARIES}"
             "protobuf::libprotobuf"
@@ -499,6 +575,7 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPC_CRONET_LIBRARY_RELEASE}")
         endif()
 
+        unset(_deps)
         list(APPEND _deps
             "${_gRPC_BASELIB_LIBRARIES}"
             "OpenSSL::SSL"
@@ -533,8 +610,10 @@ if(GRPC_FOUND)
                 IMPORTED_LOCATION_RELEASE "${GRPC_UNSECURE_LIBRARY_RELEASE}")
         endif()
 
+        unset(_deps)
         list(APPEND _deps
             "${_gRPC_BASELIB_LIBRARIES}"
+            "${ZLIB_LIBRARIES}"
             "${_gRPC_ALLTARGETS_LIBRARIES}"
             "gRPC::gpr"
         )

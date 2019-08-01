@@ -1,11 +1,10 @@
-# Minimum CMake required
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.12)
 
 # Project
-project(HelloWorld CXX)
+project(HelloWorld)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+conan_basic_setup(TARGETS)
 
 # Dependencies
 find_package(gRPC REQUIRED)
@@ -34,6 +33,5 @@ foreach(_target
     target_link_libraries(${_target}
         PUBLIC
         gRPC::grpc++_unsecure
-        gRPC::grpc++
     )
 endforeach()

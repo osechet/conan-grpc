@@ -1,49 +1,30 @@
-Conan package for gRPC
---------------------------------------------
+This repository holds a conan recipe for gRPC.
+---
 
-[![Build Status](https://travis-ci.org/osechet/conan-grpc.svg?branch=master)](https://travis-ci.org/osechet/conan-grpc)
+## Package Status
 
-[![Build status](https://ci.appveyor.com/api/projects/status/fugfyh9vcv6qu60j?svg=true)](https://ci.appveyor.com/project/osechet/conan-grpc)
+| Bintray | Appveyor | Travis |
+|---------|-----------|--------|
+|[ ![Download](https://api.bintray.com/packages/osechet/public-conan/gRPC:osechet/images/download.svg?version=1.12.0:testing) ](https://bintray.com/osechet/public-conan/gRPC:osechet/1.12.0:testing/link)|[![Build status](https://ci.appveyor.com/api/projects/status/github/osechet/conan-grpc?svg=true)](https://ci.appveyor.com/project/osechet/conan-grpc)|[![Build Status](https://travis-ci.org/osechet/conan-grpc.svg?branch=testing/1.12.0)](https://travis-ci.org/osechet/conan-grpc)|
 
-[ ![Download](https://api.bintray.com/packages/osechet/Conan/gRPC%3Aosechet/images/download.svg?version=1.3.7%3Atesting) ](https://bintray.com/osechet/Conan/gRPC%3Aosechet/1.3.7%3Atesting/link)
+## Conan.io Information
 
-[Conan.io](https://conan.io) package for [gRPC](http://www.grpc.io/) library.
+My packages can be found in the following public Conan repository:
 
-The packages generated with this **conanfile** can be found in [bintray.com](https://bintray.com/osechet/Conan/gRPC%3Aosechet).
+[osechet Public Conan Repository on Bintray](https://bintray.com/osechet/public-conan)
 
-## Reuse the package
+*Note: You can click the "Set Me Up" button on the Bintray page above for instructions on using packages from this repository.*
 
-### Basic setup
+## License Information
 
-```
-$ conan install gRPC/1.3.7@osechet/testing
-```
+The contents of this GIT repository are completely separate from the software being packaged and therefor licensed separately.  The license for all files contained in this GIT repository are defined in the [LICENSE.md](LICENSE.md) file in this repository. The licenses included with the gRPC package published by this recipe can be found in the Conan package directories in the following location, relative to the Conan Cache root (`~/.conan` by default):
 
-### Project setup
+### License(s) for packaged software:
 
-If you handle multiple dependencies in your project is better to add a *conanfile.txt*
-```
-    [requires]
-    gRPC/1.3.7@osechet/testing
+    ~/.conan/data/gRPC/<pkg_version>/osechet/<channel>/package/<random_package_id>/<LICENSE_FILES_HERE>
 
-    [options]
+*Note :   The most common filenames for OSS licenses are `LICENSE` AND `COPYING` without file extensions.*
 
-    [generators]
-    cmake
-```
-Complete the installation of requirements for your project running:
-```
-    conan install .
-```
-Project setup installs the library (and all his dependencies) and generates the files *conanbuildinfo.txt* and *conanbuildinfo.cmake* with all the paths and variables that you need to link with your dependencies.
+### License for this recipe:
 
-## Develop the package
-
-### Build packages
-
-    $ pip install conan_package_tools
-    $ python build.py
-
-### Upload packages to server
-
-    $ conan upload gRPC/1.3.7@osechet/testing --all
+    ~/.conan/data/gRPC/<pkg_version>/osechet/<channel>/export/LICENSE.md
