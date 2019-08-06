@@ -6,7 +6,7 @@ class GrpcConan(ConanFile):
     """ gRPC Conan package """
 
     name = "gRPC"
-    version = "1.12.0"
+    version = "1.22.0"
     description = "Conan package for gRPC"
     license = "MIT"
     url = "https://github.com/osechet/conan-grpc"
