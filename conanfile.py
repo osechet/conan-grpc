@@ -1,5 +1,6 @@
 
-from conans import CMake, ConanFile, tools
+import os
+from conans import ConanFile, CMake, tools
 
 
 class GrpcConan(ConanFile):
@@ -7,69 +8,66 @@ class GrpcConan(ConanFile):
 
     name = "gRPC"
     version = "1.12.0"
-    description = "Conan package for gRPC"
     license = "MIT"
+    description = "Conan package for gRPC"
+    author = "https://github.com/osechet"
     url = "https://github.com/osechet/conan-grpc"
+    homepage = "https://github.com/grpc/grpc"
+    topics = ("grpc", "rpc", "protobuf")
     settings = "os", "compiler", "build_type", "arch"
+    requires = ("c-ares/1.15.0@conan/stable", "OpenSSL/1.0.2l@conan/stable",
+                "protobuf/3.6.1@bincrafters/stable", "protoc_installer/3.6.1@bincrafters/stable",
+                "zlib/1.2.11@conan/stable")
     generators = "cmake"
-    requires = "protobuf/3.6.1@bincrafters/stable", "OpenSSL/1.0.2l@conan/stable"
-    exports = ["LICENSE.md", "FindgRPC.cmake"]
+    exports = ("LICENSE.md", "grpc.patch")
 
-
-    def source(self):
-        self.run("git clone -b v%s https://github.com/grpc/grpc.git" % self.version)
-        with tools.chdir("grpc"):
-            self.run("git submodule update --init")
+    # variables for build
+    _base_name = "grpc"
 
 
     def build_requirements(self):
+        self.build_requires("cmake_installer/3.13.0@conan/stable")
         if self.settings.os == "Windows":
             self.build_requires("ninja_installer/1.9.0@bincrafters/stable")
 
 
-    def build_unix(self):
-        """ Build on Unix systems """
-        cxx_flags = []
-        if self.settings.compiler.libcxx == "libstdc++":
-            cxx_flags.append("-D_GLIBCXX_USE_CXX11_ABI=0")
-        else:
-            cxx_flags.append("-D_GLIBCXX_USE_CXX11_ABI=1")
-        with tools.chdir("grpc"):
-            self.run("CXXFLAGS=%s make prefix=%s install-headers install-static install-plugins" %
-                     (" ".join(cxx_flags), self.package_folder))
-
-
-    def build_windows(self):
-        """ Build on Windows systems """
-        # For MinGW, we must add -D_WIN32_WINNT=0x0600 to CXX_FLAGS
-        cmake = CMake(self, generator="Ninja")
-        cmake.definitions["CMAKE_INSTALL_PREFIX"] = self.package_folder
-        cmake.configure(source_dir="grpc")
-        cmake.build()
-        cmake.build(target="install")
+    def source(self):
+        sha256 = "eb9698f23aeec2c3832601fa3f804e4d9dc28eca3cc560ef466c9ade1ec951db"
+        tools.get("{0}/archive/v{1}.tar.gz".format(self.homepage, self.version), sha256=sha256)
+        extracted_dir = self._base_name + "-" + self.version
+        os.rename(extracted_dir, self._base_name)
 
 
     def build(self):
+        tools.patch(base_path=self._base_name, patch_file="grpc.patch")
+
         if self.settings.os == "Windows":
-            self.build_windows()
+            cmake = CMake(self, generator="Ninja")
         else:
-            self.build_unix()
+            cmake = CMake(self)
+        cmake.definitions["gRPC_ZLIB_PROVIDER"] = "package"
+        cmake.definitions["gRPC_CARES_PROVIDER"] = "package"
+        cmake.definitions["gRPC_SSL_PROVIDER"] = "package"
+        cmake.definitions["gRPC_PROTOBUF_PROVIDER"] = "package"
+        cmake.configure(source_dir=self._base_name)
+        cmake.build()
+        cmake.install()
 
 
     def package(self):
-        self.copy("FindgRPC.cmake", src=".", dst=".")
-        self.copy("LICENSE", src="grpc", dst=".")
+        self.copy("LICENSE", src=self._base_name, dst=".")
 
 
     def package_info(self):
         self.cpp_info.libs = [
             "gpr"
+            "grpc_cronet",
+            "grpc_plugin_support",
+            "grpc_unsecure",
             "grpc",
-            "grpc++",
             "grpc++_cronet",
             "grpc++_error_details",
             "grpc++_reflection",
             "grpc++_unsecure",
-            "grpc_cronet",
-            "grpc_unsecure",
+            "grpc++",
         ]
