@@ -1,0 +1,34 @@
+jobs:
+- job: Linux
+  pool:
+    vmImage: 'ubuntu-16.04'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.6'
+      architecture: 'x64'
+
+  - script: |
+      chmod +x .ci/install.sh
+      ./.travis/install.sh
+      chmod +x .ci/run.sh
+      ./.travis/run.sh
+
+  strategy:
+    matrix:
+      GCC4.9:
+        CONAN_GCC_VERSIONS: 4.9
+        CONAN_DOCKER_IMAGE: conanio/gcc49
+      GCC5:
+        CONAN_GCC_VERSIONS: 5
+        CONAN_DOCKER_IMAGE: conanio/gcc5
+      GCC6:
+        CONAN_GCC_VERSIONS: 6
+        CONAN_DOCKER_IMAGE: conanio/gcc6
+      GCC7:
+        CONAN_GCC_VERSIONS: 7
+        CONAN_DOCKER_IMAGE: conanio/gcc7
+      GCC8:
+        CONAN_GCC_VERSIONS: 8
+        CONAN_DOCKER_IMAGE: conanio/gcc8
