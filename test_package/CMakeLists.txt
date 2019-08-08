@@ -12,6 +12,10 @@ find_package(gRPC REQUIRED)
 # Proto file
 get_filename_component(PROTO_FILE "helloworld.proto" ABSOLUTE)
 
+if (MSVC)
+    add_definitions(-D_WIN32_WINNT=0x600)
+endif()
+
 # Generated sources
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILE})
 grpc_generate_cpp(GRPC_SRCS GRPC_HDRS ${PROTO_FILE})
