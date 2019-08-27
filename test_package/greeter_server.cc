@@ -25,7 +25,10 @@
 #ifdef BAZEL_BUILD
 #include "examples/protos/helloworld.grpc.pb.h"
 #else
+#pragma warning(push,0)
+#pragma warning(disable:4800)
 #include "helloworld.grpc.pb.h"
+#pragma warning(pop)
 #endif
 
 using grpc::Server;

@@ -24,7 +24,10 @@
 #include <grpcpp/grpcpp.h>
 #include <grpc/support/log.h>
 
+#pragma warning(push,0)
+#pragma warning(disable:4800)
 #include "helloworld.grpc.pb.h"
+#pragma warning(pop)
 
 using grpc::Server;
 using grpc::ServerAsyncResponseWriter;
