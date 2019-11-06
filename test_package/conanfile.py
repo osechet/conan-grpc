@@ -17,6 +17,9 @@ class GdalTestConan(ConanFile):
         cmake.build()
 
     def test(self):
+        if self.arch != self.arch_build:
+            # Cannot run tests when cross-building
+            return
         fnull = open(os.devnull, 'w')
         server = subprocess.Popen([os.sep.join([".", "bin", "greeter_server"])],
                                   stdout=fnull,
