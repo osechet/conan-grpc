@@ -15,7 +15,7 @@ class GrpcConan(ConanFile):
     homepage = "https://github.com/grpc/grpc"
     topics = ("grpc", "rpc", "protobuf")
     settings = "os", "compiler", "build_type", "arch"
-    requires = ("c-ares/1.15.0@conan/stable", "OpenSSL/1.0.2l@conan/stable",
+    requires = ("c-ares/1.15.0@conan/stable", "OpenSSL/1.1.1@conan/stable",
                 "protobuf/3.6.1@bincrafters/stable", "protoc_installer/3.6.1@bincrafters/stable",
                 "zlib/1.2.11@conan/stable")
     generators = "cmake"
