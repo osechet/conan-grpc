@@ -12,7 +12,7 @@ class GrpcConan(ConanFile):
     url = "https://github.com/osechet/conan-grpc"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
-    requires = "protobuf/3.6.1@bincrafters/stable", "OpenSSL/1.1.1d@conan/stable"
+    requires = "protobuf/3.6.1@bincrafters/stable", "OpenSSL/1.1.1@conan/stable"
     exports = ["LICENSE.md", "FindgRPC.cmake"]
 
 
