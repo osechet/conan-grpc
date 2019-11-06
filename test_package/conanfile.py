@@ -17,7 +17,7 @@ class GdalTestConan(ConanFile):
         cmake.build()
 
     def test(self):
-        if self.arch != self.arch_build:
+        if self.settings.arch != self.settings.arch_build:
             # Cannot run tests when cross-building
             return
         fnull = open(os.devnull, 'w')
