@@ -5,7 +5,7 @@ This repository holds a conan recipe for gRPC.
 
 | Bintray | Appveyor | Travis |
 |---------|-----------|--------|
-|[ ![Download](https://api.bintray.com/packages/osechet/public-conan/gRPC:osechet/images/download.svg?version=1.12.0:testing) ](https://bintray.com/osechet/public-conan/gRPC:osechet/1.12.0:testing/link)|[![Build status](https://ci.appveyor.com/api/projects/status/github/osechet/conan-grpc?svg=true)](https://ci.appveyor.com/project/osechet/conan-grpc)|[![Build Status](https://travis-ci.org/osechet/conan-grpc.svg?branch=testing/1.12.0)](https://travis-ci.org/osechet/conan-grpc)|
+|[ ![Download](https://api.bintray.com/packages/osechet/public-conan/gRPC:osechet/images/download.svg?version=1.25.0:testing) ](https://bintray.com/osechet/public-conan/gRPC:osechet/1.25.0:testing/link)|[![Build status](https://ci.appveyor.com/api/projects/status/github/osechet/conan-grpc?svg=true)](https://ci.appveyor.com/project/osechet/conan-grpc)|[![Build Status](https://travis-ci.org/osechet/conan-grpc.svg?branch=testing/1.25.0)](https://travis-ci.org/osechet/conan-grpc)|
 
 ## Conan.io Information
 

@@ -7,7 +7,7 @@ class GrpcConan(ConanFile):
     """ gRPC Conan package """
 
     name = "gRPC"
-    version = "1.12.0"
+    version = "1.25.0"
     license = "MIT"
     description = "Conan package for gRPC"
     author = "https://github.com/osechet"
@@ -16,8 +16,9 @@ class GrpcConan(ConanFile):
     topics = ("grpc", "rpc", "protobuf")
     settings = "os", "compiler", "build_type", "arch"
     requires = ("c-ares/1.15.0@conan/stable", "OpenSSL/1.1.1@conan/stable",
-                "protobuf/3.6.1@bincrafters/stable", "protoc_installer/3.6.1@bincrafters/stable",
+                "protobuf/3.9.1@bincrafters/stable",
                 "zlib/1.2.11@conan/stable")
+    build_requires = ("protoc_installer/3.9.1@bincrafters/stable")
     generators = "cmake"
     exports = ("LICENSE.md", "grpc.patch")
 
@@ -32,7 +33,7 @@ class GrpcConan(ConanFile):
 
 
     def source(self):
-        sha256 = "eb9698f23aeec2c3832601fa3f804e4d9dc28eca3cc560ef466c9ade1ec951db"
+        sha256 = "ffbe61269160ea745e487f79b0fd06b6edd3d50c6d9123f053b5634737cf2f69"
         tools.get("{0}/archive/v{1}.tar.gz".format(self.homepage, self.version), sha256=sha256)
         extracted_dir = self._base_name + "-" + self.version
         os.rename(extracted_dir, self._base_name)

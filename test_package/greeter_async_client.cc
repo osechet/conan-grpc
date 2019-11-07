@@ -23,10 +23,11 @@
 #include <grpcpp/grpcpp.h>
 #include <grpc/support/log.h>
 
-#pragma warning(push,0)
-#pragma warning(disable:4800)
+#ifdef BAZEL_BUILD
+#include "examples/protos/helloworld.grpc.pb.h"
+#else
 #include "helloworld.grpc.pb.h"
-#pragma warning(pop)
+#endif
 
 using grpc::Channel;
 using grpc::ClientAsyncResponseReader;

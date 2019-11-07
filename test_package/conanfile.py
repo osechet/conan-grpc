@@ -9,7 +9,7 @@ class GdalTestConan(ConanFile):
 
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake", "virtualenv"
-    requires = ("cmake_installer/3.13.0@conan/stable", "protoc_installer/3.6.1@bincrafters/stable")
+    build_requires = ("cmake_installer/3.13.0@conan/stable", "protoc_installer/3.9.1@bincrafters/stable")
 
     def build(self):
         cmake = CMake(self)

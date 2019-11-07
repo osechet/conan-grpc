@@ -15,7 +15,7 @@ conan install . --install-folder=tmp/source
 conan build . --source-folder=tmp/source --build-folder=tmp/source --package-folder=tmp/package
 conan package . --source-folder=tmp/source --build-folder=tmp/source --package-folder=tmp/package
 conan export-pkg . osechet/testing --package-folder=tmp/package -f
-conan test test_package gRPC/1.12.0@osechet/testing
+conan test test_package gRPC/1.25.0@osechet/testing
 ```
 
 ## Creating the package

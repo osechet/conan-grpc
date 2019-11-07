@@ -1,10 +1,10 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f58ee19..b4b42e0 100644
+index 0693fe1..ee97a09 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -30,6 +30,9 @@ set(PACKAGE_TARNAME   "${PACKAGE_NAME}-${PACKAGE_VERSION}")
+@@ -31,6 +31,9 @@ set(PACKAGE_TARNAME   "${PACKAGE_NAME}-${PACKAGE_VERSION}")
  set(PACKAGE_BUGREPORT "https://github.com/grpc/grpc/issues/")
- project(${PACKAGE_NAME} C CXX)
+ project(${PACKAGE_NAME} LANGUAGES C CXX)
 
 +include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 +conan_basic_setup(TARGETS)
@@ -12,41 +12,32 @@ index f58ee19..b4b42e0 100644
  set(gRPC_INSTALL_BINDIR "bin" CACHE STRING "Installation directory for executables")
  set(gRPC_INSTALL_LIBDIR "lib" CACHE STRING "Installation directory for libraries")
  set(gRPC_INSTALL_INCLUDEDIR "include" CACHE STRING "Installation directory for headers")
-@@ -16108,3 +16111,7 @@ foreach(_config gRPCConfig gRPCConfigVersion)
-     DESTINATION ${gRPC_INSTALL_CMAKEDIR}
+@@ -19478,6 +19481,10 @@ foreach(_config gRPCConfig gRPCConfigVersion)
    )
  endforeach()
-+
+
 +install(FILES cmake/gRPCFunctions.cmake
 +  DESTINATION ${gRPC_INSTALL_CMAKEDIR}
 +)
++
+ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/etc/roots.pem
+   DESTINATION ${gRPC_INSTALL_SHAREDIR})
+
 diff --git a/cmake/gRPCConfig.cmake.in b/cmake/gRPCConfig.cmake.in
-index 1a0fa6a..50cfb32 100644
+index 1a0fa6a..d869615 100644
 --- a/cmake/gRPCConfig.cmake.in
 +++ b/cmake/gRPCConfig.cmake.in
-@@ -1,8 +1,11 @@
--# Depend packages
--@_gRPC_FIND_ZLIB@
--@_gRPC_FIND_PROTOBUF@
--@_gRPC_FIND_SSL@
--@_gRPC_FIND_CARES@
--
--# Targets
--include(${CMAKE_CURRENT_LIST_DIR}/gRPCTargets.cmake)
-+# Depend packages
-+@_gRPC_FIND_ZLIB@
-+@_gRPC_FIND_PROTOBUF@
-+@_gRPC_FIND_SSL@
-+@_gRPC_FIND_CARES@
-+
-+# Targets
-+include(${CMAKE_CURRENT_LIST_DIR}/gRPCTargets.cmake)
+@@ -6,3 +6,7 @@
+
+ # Targets
+ include(${CMAKE_CURRENT_LIST_DIR}/gRPCTargets.cmake)
 +
 +# Functions
 +include(${CMAKE_CURRENT_LIST_DIR}/gRPCFunctions.cmake)
++
 diff --git a/cmake/gRPCFunctions.cmake b/cmake/gRPCFunctions.cmake
 new file mode 100644
-index 0000000..716a28d
+index 0000000..9a9d91f
 --- /dev/null
 +++ b/cmake/gRPCFunctions.cmake
 @@ -0,0 +1,125 @@
