@@ -18,6 +18,42 @@ conan export-pkg . osechet/testing --package-folder=tmp/package -f
 conan test test_package gRPC/1.25.0@osechet/testing
 ```
 
+Note: When cross-compiling, you need to first build gRPC for your platform, then set the
+`GRPC_INSTALL_PREFIX` variable to the root of thar gRPC package and then build for the target platform:
+```
+conan install gRPC/1.25.0@osechet/testing --build missing
+conan info --paths gRPC/1.25.0@osechet/testing
+export GRPC_INSTALL_PREFIX=/path/returned/by/conan_info
+conan create . osechet/testing --profile <target_profile>
+```
+
+Here is an example of profile for armv7 using the [Linaro](https://releases.linaro.org/components/toolchain/binaries/latest-5/arm-linux-gnueabi/) gcc compiler:
+```
+[settings]
+os=Linux
+os_build=Linux
+arch=armv7
+arch_build=x86_64
+compiler=gcc
+compiler.version=5
+compiler.libcxx=libstdc++
+build_type=Release
+[options]
+[build_requires]
+*: cmake_installer/3.13.0@conan/stable
+[env]
+STRIP=arm-linux-gnueabi-strip
+CC=arm-linux-gnueabi-gcc
+CHOST=arm-linux-gnueabi
+RC=arm-linux-gnueabi-windres
+AS=arm-linux-gnueabi-as
+PATH=['/opt/gcc-linaro-5.5.0-2017.10-x86_64_arm-linux-gnueabi/bin']
+RANLIB=arm-linux-gnueabi-ranlib
+AR=arm-linux-gnueabi-ar
+CONAN_CMAKE_FIND_ROOT_PATH=/opt/gcc-linaro-5.5.0-2017.10-x86_64_arm-linux-gnueabi
+CXX=arm-linux-gnueabi-g++
+```
+
 ## Creating the package
 
 Once the package has been tested, it is possible to create it using the

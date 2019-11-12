@@ -7,16 +7,24 @@ from conans import ConanFile, CMake
 class GdalTestConan(ConanFile):
     """ GDAL Conan package test """
 
-    settings = "os", "compiler", "build_type", "arch"
+    settings = "os", "compiler", "build_type", "arch", "arch_build"
     generators = "cmake", "virtualenv"
-    build_requires = ("cmake_installer/3.13.0@conan/stable", "protoc_installer/3.9.1@bincrafters/stable")
+    build_requires = ("cmake_installer/3.13.0@conan/stable",
+                      "protoc_installer/3.9.1@bincrafters/stable")
 
     def build(self):
+        if self.settings.arch != self.settings.arch_build:
+            # Do not build when cross-compiling, since we canot run the executable
+            return
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
 
     def test(self):
+        if self.settings.arch != self.settings.arch_build:
+            # Cannot run cross-compiled executables
+            return
+
         fnull = open(os.devnull, 'w')
         server = subprocess.Popen([os.sep.join([".", "bin", "greeter_server"])],
                                   stdout=fnull,
